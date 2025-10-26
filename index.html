@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+
+
+</head>
+<body>
+
+
+
+<section>
+        
+    <div x-data="TaskManager()" class="test">
+        <div class="form">
+        <input type="text" placeholder="Saissisez votre titre" x-model="title">
+        <input type="text" placeholder="description" x-model="description">
+        <select name="" id="" x-model="status">
+            <option value="A faire" >A faire</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminée">Terminée</option>
+        </select>
+        <button @click="addTask()"> Ajouter</button>
+        </div>
+        <input type="text" placeholder=" Rechercher par titre..." x-model="searchTerm" class="search-input">
+        <div class="testTache">
+            <div class="TitleTache">
+                <h1 >Tâches à faire</h1>
+                <p>nombres de tache: <span x-text="tasks.filter(t => t.status === 'A faire').length"></span></p>
+            </div>
+
+        <template x-for="(task, i) in filterTask('A faire')" :key="task.id">
+            <div class="tache">
+                <h1 x-text="task.title">titre</h1>
+                <p x-text="task.description"></p>
+                <p >Status: <span x-text="task.status"></span></p>
+                <select name="" id="" x-model="task.status">
+                    <option value="A faire" >A faire</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminée">Terminée</option>
+                </select>
+                <button @click="confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?') && tasks.splice(i, 1)">🗑</button>
+                <button class="edit-btn" @click="editTask(i)">✏️</button>
+                </div>
+        </template>
+        </div>
+
+        <div class="testTache"> 
+            <div class="titleEncours">
+            <h1 >Tâches en cours</h1>
+            <p>nombres de tache: <span x-text="tasks.filter(t => t.status === 'En cours').length"></span></p>
+            </div>
+        <template x-for="(task, i) in filterTask('En cours')" :key="task.id">
+            <div class="tache">
+                <h1 x-text="task.title">titre</h1>
+                <p x-text="task.description"></p>
+                <p >Status: <span x-text="task.status"></span></p>
+                <select name="" id="" x-model="task.status">
+                    <option value="A faire" >A faire</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminée">Terminée</option>
+                </select>
+                <button @click="confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?') && tasks.splice(i, 1)">🗑</button>
+                <button class="edit-btn" @click="editTask(i)">✏️</button>
+            </div>
+        </template>
+        </div>
+
+        <div class="testTache">
+            <div class="titleFini">
+            <h1 >Tâches Terminées</h1>
+            <p>nombres de tache: <span x-text="tasks.filter(t => t.status === 'Terminée').length"></span></p>
+            </div>
+        <template x-for="(task, i) in filterTask('Terminée')" :key="task.id">
+            <div class="tache">
+                <h1 x-text="task.title">titre</h1>
+                <p x-text="task.description"></p>
+                <p >Status: <span x-text="task.status"></span></p>
+                <select name="" id="" x-model="task.status">
+                    <option value="A faire" >A faire</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Terminée">Terminée</option>
+                </select>
+                <button @click="confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?') && tasks.splice(i, 1)">🗑</button>
+                <button class="edit-btn" @click="editTask(i)">✏️</button>
+            </div>
+        </template>
+        </div>
+
+    </div>
+
+
+
+
+</section>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('TaskManager',  () => ({
+            tasks: Alpine.$persist([]),
+            title: '',
+            description: '',
+            status: 'A faire',
+            searchTerm: '',
+
+        addTask() {
+        if (this.title.trim() !== '' && this.description.trim() !== '') {
+            this.tasks.push({
+                id: Date.now(),
+                title: this.title,
+                description: this.description,
+                status: this.status
+            });
+        } else {
+            alert("Remplisser tout les champs");
+        }
+
+
+
+        this.title = '';
+        this.description = '';
+        this.status = 'A faire';
+        },
+
+        editTask(i) {
+            
+            const newTitle = prompt('Entrez le nouveau titre', this.tasks[i].title);
+            const newDescription = prompt('Entrez la nouvelle description', this.tasks[i].description);
+            if (newTitle !== null) {
+                this.tasks[i].title = newTitle;
+            }
+            if (newDescription !== null) {
+                this.tasks[i].description = newDescription;
+            }
+        },
+
+        filterTask(status) {
+            return this.tasks.filter(task => {
+                const matchesStatus = task.status === status;
+
+                const matchesSearch = !this.searchTerm || task.title.toLowerCase().includes(this.searchTerm.toLowerCase());
+                return matchesStatus && matchesSearch;
+            });
+        }
+    }));
+
+    });
+</script>
+</body>
+</html>
